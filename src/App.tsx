@@ -169,7 +169,6 @@ function App() {
             <div className="flex items-center justify-center">
               <div className="text-7xl font-bold countdown-text text-blue-400">{workCountdown}</div>
             </div>
-            <p className="text-blue-300 text-lg mt-2">Özgürlüğe Kalan Süre</p>
           </div>
 
           {/* Prayer times section */}
