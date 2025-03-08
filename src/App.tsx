@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { format, differenceInSeconds, parseISO, addDays } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { Moon, Sun, AlertCircle, Clock } from 'lucide-react';
+import { Moon, Sun, AlertCircle } from 'lucide-react';
 
 interface PrayerTimes {
   Imsak: string;
@@ -15,6 +15,12 @@ function App() {
   const [workCountdown, setWorkCountdown] = useState<string>('');
   const [nextPrayer, setNextPrayer] = useState<'iftar' | 'sahur'>('iftar');
   const [error, setError] = useState<string | null>(null);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const toggleRef = useRef<HTMLDivElement>(null);
+
+  const handleThemeToggle = () => {
+    setIsDarkTheme(prev => !prev);
+  };
 
   useEffect(() => {
     const fetchPrayerTimes = async () => {
@@ -64,7 +70,6 @@ function App() {
       const sahurTime = parseISO(`${today}T${prayerTimes.Imsak}`);
       const nextDaySahurTime = addDays(sahurTime, 1);
       
-      // Set fixed 17:00 (5 PM) time
       const workEndTime = parseISO(`${today}T17:00:00`);
       const nextDayWorkEndTime = addDays(workEndTime, 1);
 
@@ -105,8 +110,8 @@ function App() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-red-900 to-red-700 flex items-center justify-center p-4">
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center text-white shadow-xl max-w-md">
+      <div className={`min-h-screen flex items-center justify-center p-4 relative z-10 ${isDarkTheme ? 'night-theme' : 'day-theme'}`}>
+        <div className="bg-black/60 backdrop-blur-lg rounded-2xl p-8 text-center text-white shadow-xl max-w-md border border-red-800/30">
           <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-300" />
           <h2 className="text-2xl font-bold mb-4">Bağlantı Hatası</h2>
           <p className="text-lg opacity-90 mb-4">
@@ -114,7 +119,7 @@ function App() {
           </p>
           <button 
             onClick={() => window.location.reload()} 
-            className="bg-white/20 hover:bg-white/30 transition-colors px-6 py-2 rounded-lg"
+            className="bg-red-900/40 hover:bg-red-900/60 transition-colors px-6 py-2 rounded-lg"
           >
             Yenile
           </button>
@@ -125,53 +130,68 @@ function App() {
 
   if (!prayerTimes) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-900 to-blue-700 flex items-center justify-center">
+      <div className={`min-h-screen flex items-center justify-center relative z-10 ${isDarkTheme ? 'night-theme' : 'day-theme'}`}>
         <div className="text-white text-2xl animate-pulse">Yükleniyor...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-900 to-blue-700 flex items-center justify-center p-4">
-      <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center text-white shadow-xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Ankara</h1>
-          <p className="text-xl opacity-90">{format(new Date(), 'd MMMM yyyy', { locale: tr })}</p>
-        </div>
-        
-        <div className="flex items-center justify-center mb-6">
-          {nextPrayer === 'iftar' ? (
-            <Sun className="w-16 h-16 text-yellow-300" />
-          ) : (
-            <Moon className="w-16 h-16 text-yellow-300" />
-          )}
-        </div>
-
-        <div className="mb-6">
-          <h2 className="text-2xl mb-2">
-            {nextPrayer === 'iftar' ? 'İftara Kalan Süre' : 'Sahura Kalan Süre'}
-          </h2>
-          <div className="text-6xl font-bold font-mono">{countdown}</div>
-        </div>
-
-        <div className="mb-6 bg-white/5 rounded-xl p-4">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <h3 className="text-lg">🏃‍♂️</h3>
-          </div>
-          <div className="flex items-center justify-center gap-3">
-            <Clock className="w-6 h-6 text-yellow-300" />
-            <div className="text-3xl font-bold font-mono text-yellow-300">{workCountdown}</div>
+    <div className={`min-h-screen flex flex-col items-center p-4 relative z-10 transition-all duration-700 ${isDarkTheme ? 'night-theme bg-gradient-to-b from-blue-900/20 to-black/40' : 'day-theme bg-gradient-to-b from-orange-400/20 to-blue-500/20'}`}>
+      <div className="fixed top-8 right-8">
+        <div 
+          className={`theme-toggle-wrapper ${isDarkTheme ? 'night' : 'day'}`}
+          onClick={handleThemeToggle}
+          ref={toggleRef}
+        >
+          <div className="theme-toggle-track">
+            <div className="theme-icon-wrapper">
+              <div className="theme-icon">
+                {isDarkTheme ? '🌙' : '☀️'}
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4 text-center">
-          <div>
-            <p className="text-lg opacity-80">İftar</p>
-            <p className="text-2xl font-semibold">{prayerTimes.Aksam}</p>
+      <div className="w-full max-w-lg">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-2 text-blue-400">Ankara</h1>
+          <p className="text-xl text-blue-300/80">{format(new Date(), 'd MMMM yyyy', { locale: tr })}</p>
+        </div>
+
+        <div className="bg-black/40 backdrop-blur-sm rounded-2xl p-8 text-center text-white shadow-xl border border-blue-900/30">
+          {/* Escape countdown section */}
+          <div className="mb-8 bg-black/40 rounded-xl p-6 border border-blue-900/30">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-4xl">🏃</span>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="text-7xl font-bold countdown-text text-blue-400">{workCountdown}</div>
+            </div>
+            <p className="text-blue-300 text-lg mt-2">Özgürlüğe Kalan Süre</p>
           </div>
-          <div>
-            <p className="text-lg opacity-80">Sahur</p>
-            <p className="text-2xl font-semibold">{prayerTimes.Imsak}</p>
+
+          {/* Prayer times section */}
+          <div className="bg-black/40 rounded-xl p-4 border border-orange-900/30">
+            <div className="flex items-center justify-center mb-2">
+              {nextPrayer === 'iftar' ? (
+                <Sun className="w-6 h-6 text-orange-400" />
+              ) : (
+                <Moon className="w-6 h-6 text-orange-400" />
+              )}
+            </div>
+            <div className="text-3xl font-bold countdown-text text-orange-400 mb-2">{countdown}</div>
+            <div className="grid grid-cols-2 gap-4 text-sm text-orange-300/90">
+              <div>
+                <p>İftar</p>
+                <p className="font-semibold">{prayerTimes.Aksam}</p>
+              </div>
+              <div>
+                <p>Sahur</p>
+                <p className="font-semibold">{prayerTimes.Imsak}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

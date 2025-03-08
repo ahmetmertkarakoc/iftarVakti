@@ -2,8 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
 body {
-  background-image: url('../bgz.png');
+  background-image: url('/pb.jpg');
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+}
+
+/* Add a subtle dark gradient overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+  z-index: 0;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, calc(-50% - 3px)); }
+}
+
+@keyframes glow {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7)); }
+  50% { filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9)); }
+}
+
+.theme-toggle-wrapper {
+  width: 80px;
+  height: 40px;
+  padding: 4px;
+  border-radius: 30px;
+  cursor: pointer;
+  background: linear-gradient(to right, #ffd700, #ff8c00);
+  transition: all 0.4s ease;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.theme-toggle-wrapper.night {
+  background: linear-gradient(to right, #1a237e, #000051);
+}
+
+.theme-toggle-track {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.theme-icon-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translate(-50%, -50%);
+}
+
+.day .theme-icon-wrapper {
+  left: 16px;
+  background: #ffd700;
+  animation: float 3s ease-in-out infinite, glow 2s ease-in-out infinite;
+}
+
+.night .theme-icon-wrapper {
+  left: calc(100% - 16px);
+  background: #1a237e;
+  animation: float 3s ease-in-out infinite;
+}
+
+.theme-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.day .theme-icon {
+  transform: translate(-50%, -50%) rotate(360deg) scale(1.2);
+}
+
+.night .theme-icon {
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
+}
+
+/* Font transitions */
+.day-theme {
+  font-family: 'Quicksand', sans-serif;
+  transition: font-family 0.4s ease;
+}
+
+.night-theme {
+  font-family: 'Space Grotesk', sans-serif;
+  transition: font-family 0.4s ease;
+}
+
+.countdown-text {
+  transition: all 0.4s ease;
+}
+
+.day-theme .countdown-text {
+  letter-spacing: 0.5px;
+}
+
+.night-theme .countdown-text {
+  letter-spacing: 1px;
 }
